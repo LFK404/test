@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang ="zh-CN">
+    <head>
+    <meta charset="UTF-8">
+    <title>搜搜吧</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *{
+            overflow: hidden;
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Segoe UI';
+        }
+        body{
+            background-image:url('https://bing.img.run/1920x1080.php');
+            background-size:cover;
+            background-position:center;
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            padding:20px;
+            color:#fff;
+            position:relative;
+            cursor: default;
+            caret-color: transparent;
+        }
+        .header{
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            padding:15px 30px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            z-index:1000;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.705);
+        }
+        .logo{
+                font-size:26px;
+                font-weight:bold;
+                color:#66ccff;
+                display:flex;
+                justify-content:center;
+                align-items:center;
+            }
+        .logo i {
+                margin-right:10px;
+            }
+        .nav-links{
+                display:flex;
+                gap:25px;
+            }
+        .nav-links a{
+                color:#66ccff;
+                text-decoration:none;
+                cursor: pointer;
+                font-size:18px;
+                padding:1px 9px 4px 9px;
+                border-radius:20px;
+                transition:all 0.4s;
+            }
+        .nav-links a:hover{
+                color:#fff;
+                background:#66ccffb0;
+                transform:translateY(-1px);
+            }
+        .nav-links b {
+                background: linear-gradient(to right, #ff0000, #ff9900, #ffff00, #00ff00, #0066ff, #6600ff, #ff00ff);
+                background-size: 400% 100%;
+                background-clip: text;
+                color: transparent;
+                animation: rainbow 8s infinite linear;
+                padding:1px 9px 4px 9px;
+                border-radius:20px;
+                cursor: pointer;
+                transition:all 0.3s;
+            }
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        .nav-links b:hover{
+            font-size:20px;
+            font-weight: 500;
+            transform:translateY(-2px);
+            }
+        .container{
+                width:100%;
+                max-width:700px;
+                text-align:center;
+                padding:30px;
+                background:rgba(255,255,255,0.2);
+                backdrop-filter: blur(6px);
+                border-radius:20px;
+                box-shadow:0 15px 30px rgba(0,0,0,0.5);
+                margin-top:60px;
+            }
+        .time-display{
+                font-size:80px;
+                font-weight:300;
+                margin-bottom:10px;
+                text-shadow:0 8px 15px rgba(0,0,0,0.6);
+            }
+        .date-display{
+                font-size:25px;
+                margin-bottom:20px;
+                text-shadow:0 5px 15px rgba(0,0,0,0.4);
+            }
+        .search-box{
+                display:flex;
+                background:rgba(255,255,255,0.3);
+                border-radius:50px;
+                padding:5px;
+                margin-bottom:40px;
+                box-shadow:0 10px 20px rgba(0,0,0,0.2);
+            }
+        .search-box:focus-within{
+                background:rgba(255,255,255,0.2);
+                transform:translateY(-1px);
+            }
+        input{
+            caret-color: auto;
+        }
+        .search-input{
+                flex:1;
+                border:none;
+                background:transparent;
+                padding:15px 20px;
+                font-size:18px;
+                color:#fff;
+                outline:none;
+            }
+        .search-input::placeholder{
+                color:rgba(255, 255, 255, 0.8);
+            }
+        .search-icon,.action-icon{
+                width:55px;
+                height:55px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                cursor:pointer;
+                font-size: 28px; 
+                color:#fff;
+                transition: all 0.5s; 
+                border-radius:50%;
+            }
+        .search-icon:hover,.action-icon:hover{
+                background:rgba(255,255,255,0.05);
+                color:#66ccff;
+            }
+        .discovery{
+                text-align:left;
+                margin-top:20px;
+            }
+        .discovery-header{
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:15px;
+                padding-bottom:10px;
+                border-bottom:1px solid rgba(255,255,255,0.2);
+            }
+        .discovery-title{
+                font-size:20px;
+                font-weight:500;
+            }
+        .clear-history {
+            color: #ff5252;
+            cursor: pointer;
+            font-size: 14px;
+            padding:2px 7px 4px 8px;
+            border-radius:20px;
+            transition: all 0.2s;
+        }
+        .clear-history:hover{
+                color:#ff2828;
+                transform:translateY(-1px);
+                background: rgba(244, 88, 88, 0.087);
+            }
+        .discovery-items{
+                display:flex;
+                flex-wrap:wrap;
+                gap:12px;
+            }
+        .discovery-item{
+                background:rgba(255,255,255,0.2);
+                padding:8px 16px;
+                border-radius:20px;
+                cursor:pointer;
+                transition:all 0.2s;
+                font-size:14px;
+                white-space:nowrap;
+                overflow:hidden;
+                text-overflow:ellipsis;
+                max-width:150px;
+            }
+        .discovery-item:hover{
+                background:#66ccffa0;
+                transform:translateY(-1px);
+            }
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background:#66ccffc0;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            opacity:0;
+            z-index: 1000;
+            transition: opacity 0.7s;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            white-space: pre-line;
+            text-align: center;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-search"></i>
+            <span>搜搜吧</span>
+        </div>
+        <div class="nav-links">
+            <a href="https://chat.deepseek.com/" target="_blank">首页</a>
+            <a href="https://incu.ncuos.com/" target="_blank">发现</a>
+            <a href="https://jwxt.ncu.edu.cn/frame/homes.action?v=35956388883412217035645" target="_blank">资讯</a>
+            <a href="https://www.bilibili.com/" target="_blank">设置</a>
+            <b href="#" id="caidanButton">彩蛋</b>
+        </div>
+    </div>
+    <div class="container">
+        <div class="time-display" id="timeDisplay">00:00:00</div>
+        <div class="date-display" id="dateDisplay">2025年9月16日</div>
+        <div class="search-box">
+            <div class="search-icon" id="searchButton" title="切换到百度搜索">
+                <i class="fas fa-search"></i>
+            </div>
+            <input type="text" class="search-input" id="searchInput" placeholder="求求你输入搜索内容吧╥﹏╥...">
+            <div class="action-icon" id="historyButton" title="上一次搜索">
+                <i class="fas fa-history"></i>
+            </div>
+            <div class="action-icon" id="randomButton" title="随机推荐">
+                <i class="fas fa-random"></i>
+            </div>
+        </div>
+        <div class="discovery">
+            <div class="discovery-header">
+                <div class="discovery-title">搜索发现</div>
+                <div class="clear-history" id="clearHistory">清空历史</div>
+            </div>
+            <div class="discovery-items" id="discoveryItems">
+            </div>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded',function(){
+            const timeDisplay=document.getElementById('timeDisplay');
+            const dateDisplay=document.getElementById('dateDisplay');
+            const searchInput=document.getElementById('searchInput');
+            const searchButton=document.getElementById('searchButton');
+            const historyButton=document.getElementById('historyButton');
+            const randomButton=document.getElementById('randomButton');
+            const discoveryItems=document.getElementById('discoveryItems');
+            const clearHistory=document.getElementById('clearHistory');
+            const toast=document.getElementById('toast');
+            const caidanButton=document.getElementById('caidanButton');
+            const presetItems=[
+                '前端开发教程',
+                'JavaScript高级编程',
+                'CSS动画技巧',
+                '响应式网页设计',
+                'Vue.js框架',
+                'React学习指南',
+                'Node.js后端开发',
+                'TypeScript入门',
+                'Web性能优化',
+                '前端面试题',
+                'Git使用技巧',
+            ];
+            const randomSuggestions=[
+                '南大家园',
+                '云家园',
+                '家园工作室',
+                '小家园传声机',
+                '大佬厉害',
+                '捞捞新人╥﹏╥',
+                '救救新人╥﹏╥'
+            ];
+            let searchHistory=JSON.parse(localStorage.getItem('searchHistory'))||presetItems;
+            let lastSearch =localStorage.getItem('lastSearch')||'';
+            let orign = '必应';
+            let searchEngine;
+            let dan = 1;
+            function init(){
+                updateTime();
+                setInterval(updateTime,1000);
+                renderDiscoveryItems();
+            }
+            function updateTime(){
+                const now =new Date();
+                const timeString = now.toLocaleTimeString('zh-CN')
+                const dateString = now.toLocaleDateString('zh-CN',{
+                    year:'numeric',
+                    month:'long',
+                    day:'numeric',
+                    weekday:'long'
+                });
+                timeDisplay.textContent = timeString;
+                dateDisplay.textContent = dateString;
+            }
+            function renderDiscoveryItems(){
+                discoveryItems.innerHTML='';
+                searchHistory.forEach(item=>{
+                    const div = document.createElement('div');
+                    div.className = 'discovery-item';
+                    div.textContent = item.length > 8 ? item.substring(0,8)+'...':item;
+                    div.title = item;
+                    div.addEventListener('click',()=>{
+                        searchInput.value = item;
+                        performSearch();
+                    });
+                    discoveryItems.appendChild(div);
+                });
+            }
+            function showToast(message){
+                toast.textContent = message;
+                toast.classList.add('show');
+                setTimeout(function(){
+                    toast.classList.remove('show');
+                },3000);
+            }
+            function performSearch(){
+                const query = searchInput.value.trim();
+                if (!query) {
+                    showToast('搜索内容不能为空！');
+                    return;
+                }
+                if (!searchHistory.includes(query)){
+                    searchHistory.unshift(query);
+                    if (searchHistory.length>15){
+                        searchHistory.pop();
+                    }
+                    localStorage.setItem('searchHistory',JSON.stringify(searchHistory))
+                    renderDiscoveryItems();
+                }
+                lastSearch = query;
+                localStorage.setItem('lastSearch',query);
+                if (orign === 'baidu'){
+                    searchEngine = `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`;
+                }
+                else{
+                    searchEngine = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+                }
+                window.open(searchEngine, '_blank')
+            }
+            function showLastSearch(){
+                if (lastSearch){
+                    searchInput.value = lastSearch;
+                    searchInput.focus();
+                }
+                else {
+                    showToast('没有搜索历史！');
+                }
+            }
+            function showRandomSuggestion(){
+                const randomIndex = Math.floor(Math.random()*randomSuggestions.length);
+                searchInput.value = randomSuggestions[randomIndex];
+                searchInput.focus();
+            }
+            function clearSearchHistory(){
+                searchHistory = [...presetItems];
+                localStorage.setItem('searchHistory',JSON.stringify(searchHistory));
+                lastSearch = '';
+                localStorage.removeItem('lastSearch')
+                renderDiscoveryItems();
+                showToast('搜索历史已清空！');
+            }
+            function change(){
+                if (orign === 'baidu'){
+                    orign = 'bing';
+                    showToast('已切换到必应搜索');
+                    searchButton.innerHTML ='<i class="fas fa-search"></i>'
+                    searchButton.title = '切换到百度搜索';
+                }
+                else{
+                    orign = 'baidu';
+                    showToast('已切换到百度搜索');
+                    searchButton.innerHTML ='<i class ="fab fa-microsoft"></i>'
+                    searchButton.title = '切换到必应搜索'
+                }
+            }
+            function caidan(){
+                if (dan === 1){
+                    dan = 2
+                    showToast('学长学姐们，看在小凳这么努力，\n把空闲时间全投进来的份上');}
+                else{
+                    dan = 1
+                    showToast('就捞捞新人吧，不行的话就来个痛快吧\no(╥﹏╥)o');
+                }
+            }
+            caidanButton.addEventListener('click',caidan);
+            searchButton.addEventListener('click', change);
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            historyButton.addEventListener('click',showLastSearch);
+            randomButton.addEventListener('click',showRandomSuggestion);
+            clearHistory.addEventListener('click',clearSearchHistory);
+            init();
+        });
+    </script>
+</body>
+</html>
