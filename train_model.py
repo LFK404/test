@@ -1,13 +1,23 @@
+<<<<<<< HEAD
+=======
+# train_model.py
+>>>>>>> 155009d (🎉 init:项目初版)
 import torch
 import pandas as pd
 import numpy as np
 from transformers import (
     BertTokenizer, BertForSequenceClassification, 
+<<<<<<< HEAD
     Trainer, TrainingArguments, EarlyStoppingCallback, TrainerCallback
 )
 from sklearn.metrics import accuracy_score, f1_score
 import os
 import shutil
+=======
+    Trainer, TrainingArguments, EarlyStoppingCallback
+)
+from sklearn.metrics import accuracy_score, classification_report
+>>>>>>> 155009d (🎉 init:项目初版)
 
 # 设置设备
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -23,6 +33,7 @@ train_df = pd.read_csv('train_data.csv')
 val_df = pd.read_csv('val_data.csv')
 print(f"训练集: {len(train_df)}条, 验证集: {len(val_df)}条")
 
+<<<<<<< HEAD
 # 显示数据分布
 print("训练集分布:", train_df['rating'].value_counts().sort_index().to_dict())
 print("验证集分布:", val_df['rating'].value_counts().sort_index().to_dict())
@@ -34,6 +45,11 @@ print("原始类别权重:", class_weights)
 # 加强类别权重
 class_weights = class_weights * 3
 print("加强后类别权重:", class_weights)
+=======
+# 加载类别权重
+class_weights = np.load('class_weights.npy')
+print("类别权重:", class_weights)
+>>>>>>> 155009d (🎉 init:项目初版)
 
 # 文本编码
 def encode_texts(texts, labels):
@@ -65,6 +81,7 @@ class ReviewDataset(torch.utils.data.Dataset):
 train_dataset = ReviewDataset(train_encodings)
 val_dataset = ReviewDataset(val_encodings)
 
+<<<<<<< HEAD
 # 自定义Trainer以处理类别不平衡
 class WeightedTrainer(Trainer):
     def __init__(self, *args, **kwargs):
@@ -74,12 +91,20 @@ class WeightedTrainer(Trainer):
         self.best_macro_checkpoint = None
         self.best_weighted_checkpoint = None
         
+=======
+# 自定义Trainer以处理类别不平衡 - 修复compute_loss方法
+class WeightedTrainer(Trainer):
+>>>>>>> 155009d (🎉 init:项目初版)
     def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
         labels = inputs.get("labels")
         outputs = model(**inputs)
         logits = outputs.get("logits")
         
+<<<<<<< HEAD
         # 应用加强后的类别权重
+=======
+        # 应用类别权重
+>>>>>>> 155009d (🎉 init:项目初版)
         loss_fct = torch.nn.CrossEntropyLoss(
             weight=torch.tensor(class_weights, dtype=torch.float).to(device)
         )
@@ -87,11 +112,16 @@ class WeightedTrainer(Trainer):
         
         return (loss, outputs) if return_outputs else loss
 
+<<<<<<< HEAD
 # 计算评估指标 - 同时使用宏平均和加权平均F1分数
+=======
+# 计算评估指标
+>>>>>>> 155009d (🎉 init:项目初版)
 def compute_metrics(p):
     predictions, labels = p
     preds = np.argmax(predictions, axis=1)
     accuracy = accuracy_score(labels, preds)
+<<<<<<< HEAD
     f1_macro = f1_score(labels, preds, average='macro')  
     f1_weighted = f1_score(labels, preds, average='weighted')
     
@@ -157,18 +187,44 @@ training_args = TrainingArguments(
 save_best_callback = SaveBestModelsCallback(tokenizer)
 
 # 开始训练
+=======
+    return {'accuracy': accuracy}
+
+# 训练参数
+training_args = TrainingArguments(
+    output_dir='./results',
+    num_train_epochs=10,
+    per_device_train_batch_size=16,
+    per_device_eval_batch_size=16,
+    eval_strategy='epoch',
+    save_strategy='epoch',
+    load_best_model_at_end=True,
+    metric_for_best_model='accuracy',
+    greater_is_better=True,
+    weight_decay=0.01,
+    warmup_steps=100,
+    logging_steps=50,
+)
+
+# 开始训练（增加早停回调）
+>>>>>>> 155009d (🎉 init:项目初版)
 trainer = WeightedTrainer(
     model=model,
     args=training_args,
     train_dataset=train_dataset,
     eval_dataset=val_dataset,
     compute_metrics=compute_metrics,
+<<<<<<< HEAD
     callbacks=[EarlyStoppingCallback(early_stopping_patience=4), save_best_callback]
+=======
+    callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
+>>>>>>> 155009d (🎉 init:项目初版)
 )
 
 print("开始训练模型...")
 trainer.train()
 
+<<<<<<< HEAD
 print("训练完成！")
 print(f"训练过程中保存的最佳模型:")
 print(f"- 宏平均F1最佳模型: ./results/best_f1_macro (验证集F1: {save_best_callback.best_f1_macro:.4f})")
@@ -184,3 +240,9 @@ for model_dir in ['./results/best_f1_macro', './results/best_f1_weighted']:
             print(f"   - {file}")
     else:
         print(f"❌ {model_dir}: 目录不存在")
+=======
+# 保存模型
+trainer.save_model('./trained_model')
+tokenizer.save_pretrained('./trained_model')
+print("训练完成！")
+>>>>>>> 155009d (🎉 init:项目初版)
